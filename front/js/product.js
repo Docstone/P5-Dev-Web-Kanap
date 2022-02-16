@@ -7,31 +7,44 @@ class Product{
 //recuperation de l'id du produit via l'url
 const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
-  });
-  let productId = params.id;
+});
+let productId = params.id;
 
 //requette GET via Id
 fetch('http://localhost:3000/api/products/' + productId)
     .then(data => data.json())
     .then(jsonListDetails => {
 
-    let detail = new Product(jsonListDetails);
+    let item = new Product(jsonListDetails);
     
     //injection du HTML dans le DOM
     document.querySelector(".item__img").innerHTML +=  
-    `<img src="${detail.imageUrl}" alt="${detail.altTxt}">`;
+    `<img src="${item.imageUrl}" alt="${item.altTxt}">`;
 
     document.getElementById("title").innerHTML +=  
-    `${detail.name}`;
+    `${item.name}`;
+
+    document.getElementById("description").innerHTML +=  
+    `${item.description}`;
 
     document.getElementById("price").innerHTML +=  
-    `${detail.price}`;
+    `${item.price}`;
     
     //iteration de l'array colors, creation d'elements option pour chaque couleurs, injection des elements dans la balise select
-    for ( i=0 ; i<detail.colors.length ; i++ ){
+    for ( i = 0 ; i < item.colors.length ; i++ ){
         let option = document.createElement("option");
-        option.setAttribute('value', detail.colors[i]);
-        option.textContent = detail.colors[i];
+        option.setAttribute('value', item.colors[i]);
+        option.textContent = item.colors[i];
         document.getElementById("colors").appendChild(option);
-}
+    }
+});
+
+document.getElementById("addToCart").addEventListener("click",function(){
+    let userColor = document.getElementById("colors").value;
+    if (userColor === ""){
+        return alert('Veuillez choisir une couleur.')
+    }
+    let userQuantity = document.getElementById("quantity").value;
+    let item = new CartItem(productId, userQuantity, userColor);
+    item.addToCart();
 });
