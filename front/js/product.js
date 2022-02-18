@@ -41,10 +41,11 @@ fetch('http://localhost:3000/api/products/' + productId)
 
 document.getElementById("addToCart").addEventListener("click",function(){
     let userColor = document.getElementById("colors").value;
-    if (userColor === ""){
-        return alert('Veuillez choisir une couleur.')
-    }
     let userQuantity = document.getElementById("quantity").value;
-    let item = new CartItem(productId, userQuantity, userColor);
+    let price = document.getElementById("price").innerText;
+    if (userColor === "" || userQuantity <= 0){
+        return alert('Veuillez choisir une couleur et une quantité.')
+    }
+    let item = new CartItem(productId, userQuantity, userColor, price);
     item.addToCart();
 });
