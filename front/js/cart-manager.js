@@ -1,12 +1,20 @@
+/**
+ * @class
+ * @classdesc Create a cart product(contain id: String, quantity: Integer, color: String)
+ */
 class CartItem{
-    constructor(id, quantity, color, price){
+    constructor(id, quantity, color){
         this.id = id;
         this.quantity = quantity;         
         this.color = color;
-        this.price = price;
         this.indexDuplicate;
    }
 
+
+    /**
+     * Réccupère la liste des produits dans localStorage
+     * @return { ( Array.<{ id: String, quantity: Integer, color: String }> | [array] ) } cartProducts
+     */
     getCartProducts() {
         let cartProducts = localStorage.getItem("cartProducts");
         if(cartProducts === null){
@@ -16,10 +24,20 @@ class CartItem{
         }
     }    
     
+    /**
+     * Réccupère la liste des ID des produits dans localStorage
+     * @return {  Array.<String>  } cartProducts.id
+     */
     getCartProductsId() {
+        console.log(this.getCartProducts().map(cartProducts => cartProducts.id))
         return this.getCartProducts().map(cartProducts => cartProducts.id);
     }
     
+    /**
+     * Add to localStorage the quantity and color of product,
+     * Check if duplicate exist,if none, add product to localStorage
+     * Else add quantity to duplicate
+     */
     addToCart() {
         let cartProducts = this.getCartProducts();
         let isDuplicate = this.checkCart(cartProducts);
@@ -32,12 +50,24 @@ class CartItem{
         }
     }
 
+     /**
+     * Find product in cart that match param id and color,
+     * @param { Array.<{ id: String, quantity: Integer, color: String }> } cartProduct
+     * @return { Integer } index
+     */
     findItemByIdColor(cartProduct) {
         let cartProducts = this.getCartProducts();
         let index = cartProducts.findIndex(x => x.id === cartProduct.id && x.color === cartProduct.color)
+        console.log(typeof index)
         return index;
     }
 
+    /**
+     * Delete product in cart that match param id and color,
+     * @param { PointerEvent } e
+     * @param { Object.< id: String, quantity: Integer, color: String > } cartProduct
+     * @return { Integer } index
+     */
     deleteFromCart(e, cartProduct) {
         let cartProducts = this.getCartProducts();
         let index = this.findItemByIdColor(cartProduct)
@@ -45,12 +75,20 @@ class CartItem{
         this.saveCart(cartProducts)
         this.deleteFromPage(e)
     }
-
+    
+    /**
+     * Delete DOM element closest to the pointerEvent target,
+     * @param { PointerEvent } e
+     */
     deleteFromPage(e) {
         let toRemove = e.target.closest('article')
         toRemove.remove()
     }
-    
+    /**
+     * Update localStorage products quantity with event target value
+     * @param { PointerEvent } e
+     * @param { Object.< id: String, quantity: Integer, color: String > } cartProduct
+     */
     updateQuantity(e, cartProduct){
         let index = this.findItemByIdColor(cartProduct)
         let cartProducts = this.getCartProducts();
@@ -58,6 +96,10 @@ class CartItem{
         this.saveCart(cartProducts)
     }
 
+    /**
+     * Get number of total products in cart,
+     * @return { Integer } 
+     */
     getTotalItems(){
         let cartProducts = this.getCartProducts();
         if (cartProducts.length === 0){
@@ -68,21 +110,11 @@ class CartItem{
         }
     }
     
-    getPrice(item){
-        return parseInt(item.price) * parseInt(item.quantity);
-    }
-    
-    getTotalPrice(){
-        let cartProducts = this.getCartProducts();
-        if (cartProducts.length === 0){
-            return 0
-        }else{
-        let total = [];
-        cartProducts.forEach(item => total.push(this.getPrice(item)))
-        return total.reduce((a, b) => a + b);
-        }
-    }
-
+    /**
+     * Check if localStorage already contain product with same color
+     * @param { Array.<{ id: String, quantity: Integer, color: String }> } cartProduct
+     * @return { Boolean } 
+     */
     checkCart(cartProducts) {
         if (cartProducts.length > 0){
             for( let i = 0 ; i < cartProducts.length ; i++) {
@@ -96,8 +128,32 @@ class CartItem{
         return false;
     }
     
+    /**
+     * Sort cartProducts via id
+     * @param { Object.<{ id: String, quantity: Integer, color: String }> } cartProduct
+     * @return { Object.<{ id: String, quantity: Integer, color: String }> } sortedCart
+     */
+    sortCart(cartProducts){
+        let sortedCart = cartProducts.sort((a, b) => {
+            let idA = a.id.toLowerCase(),
+                idB = b.id.toLowerCase();
+                if(idA < idB) {
+                    return -1;
+                }
+                if(idA > idB) {
+                    return 1;
+                }
+                return 0;
+        })
+        return sortedCart;
+    }
+
+     /**
+     * Stringify and Save the sorted cart Products to local Storage
+     * @param { Object.<{ id: String, quantity: Integer, color: String }> } cartProduct
+     */
     saveCart(cartProducts) {
-        localStorage.setItem("cartProducts",JSON.stringify(cartProducts))
+        localStorage.setItem("cartProducts",JSON.stringify(this.sortCart(cartProducts)))
     }          
 }
 

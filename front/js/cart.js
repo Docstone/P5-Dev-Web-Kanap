@@ -1,27 +1,21 @@
-// document.getElementById('order').addEventListener('click', function(){
-//     var isValid = true;
-//     for ( let input of document.querySelectorAll('.form input')){
-//         isValid &= input.checkValidity();
-//         if( !isValid){
-//             document.getElementById(`${input.id}ErrorMsg`).innerText = "Ce champ n'est pas valide"
-//             break;
-//         }
-//     }
-// });
-
-
-
 let items = new CartItem;
 let cart = items.getCartProducts()
+let sortedCart = items.sortCart(cart)
 
-//return attribute key value pair for each object in argument for element
+/**
+ * Return attribute key value pair for each object in argument for element
+ * @param { HTMLElement } element
+ * @param { object } options
+ * @param { string } options.attr
+ * @return { fn } setAttribute(options.attr, option[attr])
+ */
 function setAttributes(element, options) {
    Object.keys(options).forEach(function(attr) {
      element.setAttribute(attr, options[attr])
    })
 }
 
-cart.forEach( item => {
+sortedCart.forEach( item => {
     fetch('http://localhost:3000/api/products/' + item.id)
     .then(data => data.json())
     .then(jsonListDetails => {
@@ -101,31 +95,44 @@ cart.forEach( item => {
             deleteItem.appendChild(deleteP)
     
 
-    deleteP.addEventListener("click", function(e){
-        items.deleteFromCart(e, item)
-        showQuantity()
-        showPrice()
+        deleteP.addEventListener("click", function(e){
+            items.deleteFromCart(e, item)
+            showQuantity()
         })
-
+        
         quantityInput.addEventListener("change", function(e){
             items.updateQuantity(e, item)
             showQuantity()
-            showPrice()
         })
     })
 })
 
+function getPrice(item){
+    return fetch('http://localhost:3000/api/products/' + item.id)
+    .then(data => data.json())
+    .then(jsonListDetails => item.quantity * jsonListDetails.price)
+}   
 
+
+function showTotalPrice() {
+    let cartProducts = items.getCartProducts();
+    let prices = [];
+    if (cartProducts.length === 0){
+        document.getElementById("totalPrice").innerText = 0   
+    }else{
+    cartProducts.forEach(item => {
+        getPrice(item).then(res => prices.push(res)).then( res => 
+            prices.reduce((a, b) => a + b)).then( res => document.getElementById("totalPrice")
+            .innerText = res)
+        })
+    }
+}
 
 function showQuantity(){
     document.getElementById("totalQuantity")
-.innerText = items.getTotalItems()
-}
-
-function showPrice(){
-    document.getElementById("totalPrice")
-.innerText = items.getTotalPrice()
+        .innerText = items.getTotalItems()
+        showTotalPrice()
 }
 
 showQuantity()
-showPrice()
+showTotalPrice()

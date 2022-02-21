@@ -1,9 +1,3 @@
-class Product{
-    constructor(jsonProduct){
-        jsonProduct && Object.assign(this, jsonProduct);
-    }
-}
-
 //recuperation de l'id du produit via l'url
 const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
