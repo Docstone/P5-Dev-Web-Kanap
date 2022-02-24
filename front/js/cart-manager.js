@@ -29,21 +29,22 @@ class CartItem{
      * @return {  Array.<String>  } cartProducts.id
      */
     getCartProductsId() {
-        console.log(this.getCartProducts().map(cartProducts => cartProducts.id))
         return this.getCartProducts().map(cartProducts => cartProducts.id);
     }
     
     /**
      * Add to localStorage the quantity and color of product,
-     * Check if duplicate exist,if none, add product to localStorage
+     * Check if duplicate exist,if none, add product to array, sort array and save to localStorage
      * Else add quantity to duplicate
      */
     addToCart() {
         let cartProducts = this.getCartProducts();
+     
         let isDuplicate = this.checkCart(cartProducts);
         if (isDuplicate === false){
             cartProducts.push(this);
-            this.saveCart(cartProducts);
+        let sortedCart = this.sortCart(cartProducts);
+            this.saveCart(sortedCart);
         } else {
             cartProducts[this.indexDuplicate].quantity = parseInt(cartProducts[this.indexDuplicate].quantity) + parseInt(this.quantity);
             this.saveCart(cartProducts);
@@ -58,7 +59,6 @@ class CartItem{
     findItemByIdColor(cartProduct) {
         let cartProducts = this.getCartProducts();
         let index = cartProducts.findIndex(x => x.id === cartProduct.id && x.color === cartProduct.color)
-        console.log(typeof index)
         return index;
     }
 

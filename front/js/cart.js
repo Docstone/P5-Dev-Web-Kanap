@@ -1,9 +1,12 @@
+
+
+// Create instance of cart item and sort the cart list
 let items = new CartItem;
 let cart = items.getCartProducts()
 let sortedCart = items.sortCart(cart)
 
 /**
- * Return attribute key value pair for each object in argument for element
+ * Return element with attribute key value pair for each object in option
  * @param { HTMLElement } element
  * @param { object } options
  * @param { string } options.attr
@@ -15,18 +18,36 @@ function setAttributes(element, options) {
    })
 }
 
-sortedCart.forEach( item => {
+/**
+ * fetch a product by ID for each element in the cart and create a new Product object
+ * then fill the Dom with HTML element
+ * @param { Object } sortedCart
+ * @param { String } url
+ * @param { String } item.id
+ * @return { object } product
+ */
+ sortedCart.forEach( item => {
     fetch('http://localhost:3000/api/products/' + item.id)
     .then(data => data.json())
     .then(jsonListDetails => {
     let product = new Product(jsonListDetails)
+    fillDom(product, item)
+})
 
+
+
+/**
+ * Create DOM elements and assign classes and attributes 
+ * @param { Object } product
+ * @param { Object } item
+ */
+function fillDom (product, item) {
     let article = document.createElement("article")
-        setAttributes(article, {
-            "class": "cart__item",
-            "data-id": item.id,
-            "data-color": item.color
-        })
+    setAttributes(article, {
+        "class": "cart__item",
+        "data-id": item.id,
+        "data-color": item.color
+    })
 
     let imgCont = document.createElement("div")
         imgCont.setAttribute("class", "cart__item__img")
@@ -79,6 +100,9 @@ sortedCart.forEach( item => {
         deleteP.setAttribute("class", "deleteItem")
         deleteP.innerText = "Supprimer"
 
+
+
+    // Appending elements to their parents
     document.getElementById("cart__items").appendChild(article)
     article.appendChild(imgCont)
         imgCont.appendChild(img)
@@ -95,25 +119,45 @@ sortedCart.forEach( item => {
             deleteItem.appendChild(deleteP)
     
 
+    
+        // Event Listener <on click> on the delete button
         deleteP.addEventListener("click", function(e){
             items.deleteFromCart(e, item)
             showQuantity()
         })
         
+        // Event listener <on change> on the quantity input
         quantityInput.addEventListener("change", function(e){
             items.updateQuantity(e, item)
             showQuantity()
         })
-    })
+    } 
 })
 
+/**
+ * Get the price of product from API and multiply by the quantity of items in the cart
+ * @param { Object } item
+ * @param { String } url
+ * @param { String } item.id
+ * @return { promise } 
+ */
 function getPrice(item){
     return fetch('http://localhost:3000/api/products/' + item.id)
     .then(data => data.json())
     .then(jsonListDetails => item.quantity * jsonListDetails.price)
 }   
 
+/**
+ * Check if Cart is empty, 
+ * if empty, return 0
+ * else,  iterate the cart,
+ *  push to array the price of stacked items with getPrice()
+ *  and reduce the array to get total price
+ * @param { Object } cartProducts
+ * @param { array } prices 
+ * @param { String } item.id
 
+ */
 function showTotalPrice() {
     let cartProducts = items.getCartProducts();
     let prices = [];
@@ -128,6 +172,7 @@ function showTotalPrice() {
     }
 }
 
+// Show quantity set innerText to getTotalItems() {integer} 
 function showQuantity(){
     document.getElementById("totalQuantity")
         .innerText = items.getTotalItems()
@@ -135,4 +180,3 @@ function showQuantity(){
 }
 
 showQuantity()
-showTotalPrice()
