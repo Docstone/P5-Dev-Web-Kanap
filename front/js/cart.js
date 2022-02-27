@@ -3,7 +3,7 @@
 // Create instance of cart item and sort the cart list
 let items = new CartItem;
 let cart = items.getCartProducts()
-let sortedCart = items.sortCart(cart)
+
 
 /**
  * Return element with attribute key value pair for each object in option
@@ -21,12 +21,12 @@ function setAttributes(element, options) {
 /**
  * fetch a product by ID for each element in the cart and create a new Product object
  * then fill the Dom with HTML element
- * @param { Object } sortedCart
+ * @param { Object } cart
  * @param { String } url
  * @param { String } item.id
  * @return { object } product
  */
- sortedCart.forEach( item => {
+cart.forEach( item => {
     fetch('http://localhost:3000/api/products/' + item.id)
     .then(data => data.json())
     .then(jsonListDetails => {

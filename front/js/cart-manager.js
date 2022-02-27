@@ -34,7 +34,7 @@ class CartItem{
     
     /**
      * Add to localStorage the quantity and color of product,
-     * Check if duplicate exist,if none, add product to array, sort array and save to localStorage
+     * Check if duplicate exist,if none, add product to array and save to localStorage
      * Else add quantity to duplicate
      */
     addToCart() {
@@ -43,8 +43,7 @@ class CartItem{
         let isDuplicate = this.checkCart(cartProducts);
         if (isDuplicate === false){
             cartProducts.push(this);
-        let sortedCart = this.sortCart(cartProducts);
-            this.saveCart(sortedCart);
+            this.saveCart(cartProducts);
         } else {
             cartProducts[this.indexDuplicate].quantity = parseInt(cartProducts[this.indexDuplicate].quantity) + parseInt(this.quantity);
             this.saveCart(cartProducts);
@@ -127,33 +126,13 @@ class CartItem{
         }
         return false;
     }
-    
-    /**
-     * Sort cartProducts via id
-     * @param { Object.<{ id: String, quantity: Integer, color: String }> } cartProduct
-     * @return { Object.<{ id: String, quantity: Integer, color: String }> } sortedCart
-     */
-    sortCart(cartProducts){
-        let sortedCart = cartProducts.sort((a, b) => {
-            let idA = a.id.toLowerCase(),
-                idB = b.id.toLowerCase();
-                if(idA < idB) {
-                    return -1;
-                }
-                if(idA > idB) {
-                    return 1;
-                }
-                return 0;
-        })
-        return sortedCart;
-    }
 
      /**
-     * Stringify and Save the sorted cart Products to local Storage
+     * Stringify and Save the cart Products to local Storage
      * @param { Object.<{ id: String, quantity: Integer, color: String }> } cartProduct
      */
     saveCart(cartProducts) {
-        localStorage.setItem("cartProducts",JSON.stringify(this.sortCart(cartProducts)))
+        localStorage.setItem("cartProducts",JSON.stringify(cartProducts))
     }          
 }
 
