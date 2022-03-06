@@ -14,7 +14,7 @@ class Order {
 //Regex pattern for form validation
 let firstName = document.getElementById("firstName")
     setAttributes(firstName, {
-        "pattern" : "(-?([A-Z].\s)?([a-zA-ZÀ-ÖØ-öø-ÿ][a-zÀ-ÖØ-öø-ÿ-]+)\s?)+([A-Z]'([A-Z][a-z]+))?",
+        "pattern" : "(-?([A-Z].\s)?([a-zA-ZÀ-ÖØ-öø-ÿ ][a-zÀ-ÖØ-öø-ÿ-]+)\s?)+([A-Z]'([A-Z][a-z]+))?",
         "minlength" : "2",
         "maxlength" : "25"
     })
@@ -40,6 +40,10 @@ let city = document.getElementById("city")
     })
 
 let email = document.getElementById("email")
+    setAttributes(email, {
+        "pattern" : "^[^ ]+@[^ ]+\\.[a-z]{2,6}$",
+        "maxlength" : "254"
+    })
 
 let errMsg = [
     "Veuillez entrer un prénom valide",
@@ -71,6 +75,7 @@ form.forEach((input, index)=> {
 *Event listener <onSubmit> retrieve valid form input and cart products ID,
 *Create a new Order instance, stringify and send POST request to API
 *Then if res=ok redirect to confirmation page with orderId in URL
+*and clear localStorage
 */
 document.querySelector("form").addEventListener("submit", function(e) {
     e.preventDefault()
@@ -83,7 +88,7 @@ document.querySelector("form").addEventListener("submit", function(e) {
         "email" : e.target.email.value
     }
     let order = new Order(contact, productsId)
-    console.log(productsId.length)
+
     if( productsId.length == 0) {
         alert('Votre panier est vide')
     }else{
@@ -96,7 +101,8 @@ document.querySelector("form").addEventListener("submit", function(e) {
             })
             .then(response => response.json())
             .then(response => {
-            window.location.assign(`./confirmation.html?id=${response.orderId}`);
+                localStorage.clear();    
+                window.location.assign(`./confirmation.html?id=${response.orderId}`);
             })
             .catch((error) => {
             console.error('Error:', error);
