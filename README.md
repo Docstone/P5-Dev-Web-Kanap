@@ -1,4 +1,6 @@
 # Kanap #
+Kanap —  projet OpenClassRooms
+Intégration dynamique de maquettes avec Javascript, gestion du DOM, validation de données externes, API calls et création de  plan de test
 
 This is the front end and back end server for Project 5 of the Web Developer path.
 
